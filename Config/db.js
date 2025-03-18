@@ -15,6 +15,7 @@ const connectDB = async () => {
         await import("../Models/orderModel.js");
         await import("../Models/paymentModel.js");
         await import("../Models/feedbackModel.js");
+        await import("../Models/paymentcardModel.js");
 
         console.log("Database & Schemas Initialized");
     } catch (error) {
