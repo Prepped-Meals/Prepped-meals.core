@@ -9,12 +9,11 @@ import mealRoutes from "./Routes/mealRoutes.js";
 import session from "express-session"; 
 
 
-dotenv.config(); 
+dotenv.config();
 
-// Connect to MongoDB & Seed Data
 const startServer = async () => {
-    await connectDB();
-    await seedDatabase(); 
+  await connectDB();
+  await seedDatabase();
 };
 
 startServer();
@@ -55,4 +54,3 @@ app.use("/api/create-meals",mealRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
