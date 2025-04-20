@@ -51,6 +51,7 @@ app.use(express.json());
 app.use("/api/customers", customerRoutes);
 app.use("/api/card-details", paymentcardRoutes);
 app.use("/api/create-meals",mealRoutes);
+app.use("/api/get-meals",mealRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
