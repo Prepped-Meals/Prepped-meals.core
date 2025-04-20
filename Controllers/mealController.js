@@ -46,5 +46,17 @@ const createMeal = async (req,res) =>{
     }
 };
 
-export {createMeal};
+//view all meals
+const getMeals = async (req, res) => {
+    try{
+        const meals = await Meal.find();
+
+        res.status (200).json ({meals});
+    }catch (error){
+        console.error ("Error fetching meals : ", error);
+        res.status(500).json ({error: 'Server error', message: error.message});
+    }
+};
+
+export {createMeal, getMeals};
 
