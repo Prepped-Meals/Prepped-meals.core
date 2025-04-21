@@ -3,7 +3,9 @@ import dotenv from "dotenv";
 import connectDB from "./Config/db.js";
 import customerRoutes from "./Routes/customerRoutes.js"
 import seedDatabase from "./Config/seedDB.js";
-import paymentcardRoutes from "./routes/paymentCardRoutes.js"
+import paymentcardRoutes from "./Routes/paymentCardRoutes.js";
+import cartRoutes from "./Routes/cartRoutes.js";
+import paymentRoutes from "./Routes/paymentRoutes.js";
 import cors from "cors";
 import mealRoutes from "./Routes/mealRoutes.js";
 import session from "express-session"; 
@@ -52,6 +54,8 @@ app.use(express.json());
 
 app.use("/api/customers", customerRoutes);
 app.use("/api/card-details", paymentcardRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/payments", paymentRoutes);
 app.use("/api/create-meals",mealRoutes);
 app.use("/api/get-meals",mealRoutes);
 app.use("/api/cart",cartRoutes);
