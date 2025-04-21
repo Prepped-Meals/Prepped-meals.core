@@ -6,9 +6,11 @@ export const cartDTO = Joi.object({
   meals: Joi.array()
     .items(
       Joi.object({
-        meal: Joi.string().required(),
+        meal: Joi.string().required(), // ObjectId of the meal
+        meal_name: Joi.string().required(), // New field
+        meal_price: Joi.number().min(0).required(), // Unit price from meal
         quantity: Joi.number().min(1).required(),
-        price: Joi.number().min(0).required(),
+        total_price: Joi.number().min(0).required(), // meal_price * quantity
       })
     )
     .required(),
