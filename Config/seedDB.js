@@ -26,10 +26,34 @@ const seedDatabase = async () => {
 
         // Seed Cart
         let cart = await Cart.findOne();
-        if (!cart) {
-            cart = await Cart.create({ cart_id: "CART1", customer: customer._id, meals: [{ meal: meal._id, quantity: 2, price: meal.meal_price }] });
-            console.log("Cart Created");
-        }
+
+if (!cart) {
+    const customer = await Customer.findOne();
+    const meal = await Meal.findOne();
+
+    if (!customer || !meal) {
+        console.error("Cannot create cart: Missing customer or meal");
+    } else {
+        const quantity = 2;
+        const meal_price = meal.meal_price;
+        const total_price = quantity * meal_price;
+
+        cart = await Cart.create({
+            cart_id: "CART1",
+            customer: customer._id,
+            meals: [
+                {
+                    meal: meal._id,
+                    meal_name: meal.meal_name,
+                    meal_price: meal_price,
+                    quantity: quantity,
+                    total_price: total_price
+                }
+            ]
+        });
+
+        console.log(" Cart Created:", cart.cart_id);
+    }
 
         // Seed Order
         if (!(await Order.findOne())) {
@@ -71,9 +95,11 @@ const seedDatabase = async () => {
         }
 
         console.log("Database Seeding Completed");
+    }
     } catch (error) {
         console.error("Database Seeding Error:", error);
     }
-};
+
+ };
 
 export default seedDatabase;

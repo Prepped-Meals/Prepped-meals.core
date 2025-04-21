@@ -5,9 +5,11 @@ const CartSchema = new mongoose.Schema({
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer", required: true },
     meals: [
         {
-            meal: { type: mongoose.Schema.Types.ObjectId, ref: "Meal" },
-            quantity: { type: Number, required: true },
-            price: { type: Number, required: true },
+            meal: { type: mongoose.Schema.Types.ObjectId, ref: "Meal", required: true }, // full meal ref
+            meal_name: { type: String, required: true }, // store the name at time of adding to cart
+            meal_price: { type: Number, required: true }, // price per unit from meal model
+            quantity: { type: Number, required: true }, // number of items added
+            total_price: { type: Number, required: true }, // meal_price * quantity
         },
     ],
 });
