@@ -9,8 +9,6 @@ import paymentRoutes from "./Routes/paymentRoutes.js";
 import cors from "cors";
 import mealRoutes from "./Routes/mealRoutes.js";
 import session from "express-session"; 
-import cartRoutes from "./Routes/cartRoutes.js";
-
 
 
 dotenv.config();
@@ -58,7 +56,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/create-meals",mealRoutes);
 app.use("/api/get-meals",mealRoutes);
-app.use("/api/cart",cartRoutes);
+
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
