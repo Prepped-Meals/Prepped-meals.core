@@ -1,15 +1,26 @@
 import { Router } from "express";
-import { getCustomers, createCustomer, loginCustomer } from "../Controllers/customerController.js";
+import {
+    getCustomers,
+    createCustomer,
+    loginCustomer,
+    logoutCustomer,
+    getLoggedInCustomer,
+    updateCustomer,
+    deleteCustomer,
+    updateProfilePicture,
+    resetPassword // <- Add this line
+} from "../Controllers/customerController.js";
 
 const router = Router();
 
-// Get all customers
 router.get("/", getCustomers);
-
-// Register a new customer
 router.post("/register", createCustomer);
-
-// Login a customer
 router.post("/login", loginCustomer);
+router.post("/logout", logoutCustomer);
+router.get("/me", getLoggedInCustomer);
+router.put("/me", updateCustomer);
+router.delete("/me", deleteCustomer);
+router.put("/me/profile-pic", updateProfilePicture);
+router.post("/reset-password", resetPassword); 
 
 export default router;
