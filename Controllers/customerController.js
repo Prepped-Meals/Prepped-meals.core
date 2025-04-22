@@ -1,92 +1,231 @@
 import { customerDTO } from "../Dto/customerDTOs/customerDTOs.js";
-import Customer from '../Models/customerModel.js';
-import bcrypt from 'bcrypt';
+import Customer from "../Models/customerModel.js";
+import bcrypt from "bcrypt";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
-// Function to hash passwords
+// Password hashing
 const hashPassword = async (password) => {
-    const saltRounds = 10; // Number of salt rounds
-    return await bcrypt.hash(password, saltRounds); // Hash the password
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
 };
 
-// Customer registration
+// Multer config for profile picture uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = './uploads';
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage }).single('profile_pic');
+
+// Register
 export const createCustomer = async (req, res) => {
     try {
         const { error, value } = customerDTO.validate(req.body);
-        if (error) {
-            console.log('Validation error:', error.details);
-            return res.status(400).json({ error: error.details[0].message });
-        }
+        if (error) return res.status(400).json({ error: error.details[0].message });
 
         const { confirmPassword, ...customerData } = value;
+        customerData.password = await hashPassword(customerData.password);
 
-        // Hash the password before saving
-        const hashedPassword = await hashPassword(customerData.password);
-        customerData.password = hashedPassword;
+        // Default profile pic if not provided
+        if (!customerData.profile_pic || customerData.profile_pic.trim() === "") {
+            customerData.profile_pic = "uploads/user.png";
+        }
 
         const customer = new Customer(customerData);
         await customer.save();
 
-        res.status(201).json({ message: "Customer details saved successfully", customer });
-    } catch (error) {
-        if (error.code === 11000) {
-            res.status(500).json({ error: error.message });
-        }
-    }
-};
-
-// Login customer
-export const loginCustomer = async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const customer = await Customer.findOne({ username });
-        if (!customer) {
-            return res.status(401).json({ error: "Invalid username or password" });
-        }
-
-        // Compare the password
-        const isMatch = await bcrypt.compare(password, customer.password);
-        if (!isMatch) {
-            return res.status(401).json({ error: "Invalid username or password" });
-        }
-
-        // Set session data after successful login
         req.session.user = {
             cus_id: customer.cus_id,
             username: customer.username,
             f_name: customer.f_name,
             l_name: customer.l_name,
             email: customer.email,
+            profile_pic: customer.profile_pic
         };
 
-        res.status(200).json({
-            message: "Login successful",
-            customer: {
-                cus_id: customer.cus_id,
-                username: customer.username,
-                f_name: customer.f_name,
-                l_name: customer.l_name,
-                email: customer.email,
+        res.status(201).json({ message: "Customer registered and logged in", customer: req.session.user });
+    } catch (error) {
+        if (error.code === 11000) {
+            res.status(409).json({ error: "Username or email already exists" });
+        } else {
+            res.status(500).json({ error: error.message });
+        }
+    }
+};
+
+// Login
+export const loginCustomer = async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const customer = await Customer.findOne({ username });
+        if (!customer) return res.status(401).json({ error: "Invalid username or password" });
+
+        const isMatch = await bcrypt.compare(password, customer.password);
+        if (!isMatch) return res.status(401).json({ error: "Invalid username or password" });
+
+        const profilePic = customer.profile_pic && customer.profile_pic.trim() !== ""
+            ? customer.profile_pic
+            : "uploads/user.png";
+
+        req.session.user = {
+            cus_id: customer.cus_id,
+            username: customer.username,
+            f_name: customer.f_name,
+            l_name: customer.l_name,
+            email: customer.email,
+            profile_pic: profilePic
+        };
+
+        res.status(200).json({ message: "Login successful", customer: req.session.user });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Logout
+export const logoutCustomer = (req, res) => {
+    req.session.destroy((err) => {
+        if (err) return res.status(500).json({ error: "Logout failed" });
+        res.status(200).json({ message: "Logged out successfully" });
+    });
+};
+
+// Get logged-in customer
+export const getLoggedInCustomer = async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    try {
+        const customer = await Customer.findOne({ cus_id: req.session.user.cus_id }).lean();
+        if (!customer) return res.status(404).json({ error: "Customer not found" });
+
+        if (!customer.profile_pic || customer.profile_pic.trim() === "") {
+            customer.profile_pic = "uploads/user.png";
+        }
+
+        res.status(200).json(customer);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Update customer info
+export const updateCustomer = async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const { f_name, l_name, contact_no, email } = req.body;
+
+    try {
+        const customer = await Customer.findOneAndUpdate(
+            { cus_id: req.session.user.cus_id },
+            { f_name, l_name, contact_no, email },
+            { new: true }
+        );
+
+        if (!customer) return res.status(404).json({ error: "Customer not found" });
+
+        res.status(200).json({ message: "Profile updated", customer });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+//  Update profile picture
+export const updateProfilePicture = async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    upload(req, res, async (err) => {
+        if (err || !req.file) {
+            return res.status(500).json({ error: "Error uploading file" });
+        }
+
+        try {
+            const profilePath = "/" + req.file.path.replace(/\\/g, "/");
+
+            const customer = await Customer.findOneAndUpdate(
+                { cus_id: req.session.user.cus_id },
+                { profile_pic: profilePath },
+                { new: true }
+            );
+
+            if (!customer) {
+                return res.status(404).json({ error: "Customer not found" });
             }
+
+            //  Update session with new profile picture
+            req.session.user.profile_pic = profilePath;
+
+            res.status(200).json({ message: "Profile picture updated", customer });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+};
+
+// Delete customer
+export const deleteCustomer = async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ error: "Not authenticated" });
+
+    try {
+        const result = await Customer.findOneAndDelete({ cus_id: req.session.user.cus_id });
+
+        if (!result) return res.status(404).json({ error: "Customer not found" });
+
+        req.session.destroy(() => {
+            res.status(200).json({ message: "Account deleted" });
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
 
-// Logout function
-export const logoutCustomer = (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).json({ error: "Logout failed" });
+// Reset password
+export const resetPassword = async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    try {
+        const customer = await Customer.findOne({ cus_id: req.session.user.cus_id });
+
+        if (!customer) {
+            return res.status(404).json({ error: "Customer not found" });
         }
-        res.status(200).json({ message: "Logged out successfully" });
-    });
+
+        const isMatch = await bcrypt.compare(currentPassword, customer.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: "Current password is incorrect" });
+        }
+
+        const hashedNewPassword = await hashPassword(newPassword);
+        customer.password = hashedNewPassword;
+        await customer.save();
+
+        res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
-// Get all customers
+// Get all customers (admin use)
 export const getCustomers = async (req, res) => {
     try {
-        const customers = await Customer.find(); // Fetch all customers from the database
+        const customers = await Customer.find();
         res.status(200).json(customers);
     } catch (error) {
         res.status(500).json({ error: error.message });

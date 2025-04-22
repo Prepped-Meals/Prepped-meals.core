@@ -7,7 +7,12 @@ import paymentcardRoutes from "./routes/paymentCardRoutes.js"
 import cors from "cors";
 import mealRoutes from "./Routes/mealRoutes.js";
 import session from "express-session"; 
+import path from "path"; 
+import { fileURLToPath } from "url";
 
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -48,6 +53,10 @@ app.use(
 
 app.use(express.json());
 
+app.use('/uploads', express.static('uploads'));
+
+
+
 app.use("/api/customers", customerRoutes);
 app.use("/api/card-details", paymentcardRoutes);
 app.use("/api/create-meals",mealRoutes);
@@ -55,3 +64,6 @@ app.use("/api/get-meals",mealRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
