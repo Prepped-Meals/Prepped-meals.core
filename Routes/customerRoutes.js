@@ -1,3 +1,4 @@
+import { loginCustomer } from "../Controllers/authController.js";
 import { Router } from "express";
 import {
     getCustomers,
@@ -14,7 +15,7 @@ const router = Router();
 
 router.get("/", getCustomers);
 router.post("/register", createCustomer);
-// router.post("/login", loginCustomer);
+router.post("/login", loginCustomer);
 router.post("/logout", logoutCustomer);
 router.get("/me", getLoggedInCustomer);
 router.put("/me", updateCustomer);
