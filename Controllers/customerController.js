@@ -61,34 +61,34 @@ export const createCustomer = async (req, res) => {
 };
 
 // Login
-export const loginCustomer = async (req, res) => {
-    const { username, password } = req.body;
+// export const loginCustomer = async (req, res) => {
+//     const { username, password } = req.body;
 
-    try {
-        const customer = await Customer.findOne({ username });
-        if (!customer) return res.status(401).json({ error: "Invalid username or password" });
+//     try {
+//         const customer = await Customer.findOne({ username });
+//         if (!customer) return res.status(401).json({ error: "Invalid username or password" });
 
-        const isMatch = await bcrypt.compare(password, customer.password);
-        if (!isMatch) return res.status(401).json({ error: "Invalid username or password" });
+//         const isMatch = await bcrypt.compare(password, customer.password);
+//         if (!isMatch) return res.status(401).json({ error: "Invalid username or password" });
 
-        const profilePic = customer.profile_pic && customer.profile_pic.trim() !== ""
-            ? customer.profile_pic
-            : "uploads/user.png";
+//         const profilePic = customer.profile_pic && customer.profile_pic.trim() !== ""
+//             ? customer.profile_pic
+//             : "uploads/user.png";
 
-        req.session.user = {
-            cus_id: customer.cus_id,
-            username: customer.username,
-            f_name: customer.f_name,
-            l_name: customer.l_name,
-            email: customer.email,
-            profile_pic: profilePic
-        };
+//         req.session.user = {
+//             cus_id: customer.cus_id,
+//             username: customer.username,
+//             f_name: customer.f_name,
+//             l_name: customer.l_name,
+//             email: customer.email,
+//             profile_pic: profilePic
+//         };
 
-        res.status(200).json({ message: "Login successful", customer: req.session.user });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
+//         res.status(200).json({ message: "Login successful", customer: req.session.user });
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 // Logout
 export const logoutCustomer = (req, res) => {
