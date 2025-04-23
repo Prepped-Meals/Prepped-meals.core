@@ -58,5 +58,28 @@ const getMeals = async (req, res) => {
     }
 };
 
-export {createMeal, getMeals};
+// Update a meal
+const updateMeal = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const updatedMeal = await Meal.findOneAndUpdate(
+        { meal_id: req.params.id }, // Match by your custom meal_id
+        req.body,         // Data to update
+        { new: true }     // Return the updated document
+      );
+  
+      if (!updatedMeal) {
+        return res.status(404).json({ message: "Meal not found" });
+      }
+  
+      res.status(200).json(updatedMeal);
+    } catch (error) {
+      console.error("Error updating meal:", error);
+      res.status(500).json({ error: "Server error", message: error.message });
+    }
+  };
+  
+  
+export {createMeal, getMeals, updateMeal};
 
