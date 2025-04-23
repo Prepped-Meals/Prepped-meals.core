@@ -7,6 +7,7 @@ const mealSchema = new mongoose.Schema({
     meal_price: { type: Number, required: true },
     calorie_count: { type: Number },
     admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true }, // Reference to Admin
+    meal_image: {type : String},
 });
 
 const Meal = mongoose.model('Meal', mealSchema);
