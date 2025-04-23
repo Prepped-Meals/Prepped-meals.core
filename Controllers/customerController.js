@@ -42,6 +42,7 @@ export const createCustomer = async (req, res) => {
         await customer.save();
 
         req.session.user = {
+            _id: customer._id,
             cus_id: customer.cus_id,
             username: customer.username,
             f_name: customer.f_name,
