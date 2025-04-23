@@ -5,18 +5,27 @@ import { createPayment } from "../Services/paymentServices.js";
 // @route   POST /api/payments
 // @access  Public
 export const addPayment = async (req, res) => {
-  console.log("req.body", req);
+  console.log("req.body", req.body);
   try {
     const { error } = validatePayment(req.body);
     if (error) {
-      res.status(400);
-      throw new Error(error.details.map((err) => err.message).join(", "));
+      return res.status(400).json({
+        success: false,
+        message: error.details.map((err) => err.message).join(", "),
+      });
     }
 
     const payment = await createPayment(req.body);
-    res.status(201).json(payment);
+    return res.status(201).json({
+      success: true,
+      data: payment,
+    });
   } catch (error) {
-    res.status(500);
-    throw new Error(error.message);
+    console.error("Payment Error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 };

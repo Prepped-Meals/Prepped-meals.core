@@ -51,6 +51,7 @@ export const loginCustomer = async (req, res) => {
 
         // Set session data after successful login
         req.session.user = {
+            _id: customer._id,
             cus_id: customer.cus_id,
             username: customer.username,
             f_name: customer.f_name,
@@ -61,6 +62,7 @@ export const loginCustomer = async (req, res) => {
         res.status(200).json({
             message: "Login successful",
             customer: {
+                _id: customer._id,
                 cus_id: customer.cus_id,
                 username: customer.username,
                 f_name: customer.f_name,
