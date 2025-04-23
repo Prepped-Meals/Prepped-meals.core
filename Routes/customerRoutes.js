@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
     getCustomers,
     createCustomer,
-    loginCustomer,
     logoutCustomer,
     getLoggedInCustomer,
     updateCustomer,
@@ -15,7 +14,7 @@ const router = Router();
 
 router.get("/", getCustomers);
 router.post("/register", createCustomer);
-router.post("/login", loginCustomer);
+// router.post("/login", loginCustomer);
 router.post("/logout", logoutCustomer);
 router.get("/me", getLoggedInCustomer);
 router.put("/me", updateCustomer);
