@@ -8,8 +8,9 @@ import {
     updateCustomer,
     deleteCustomer,
     updateProfilePicture,
-    resetPassword // <- Add this line
+    resetPassword 
 } from "../Controllers/customerController.js";
+
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.put("/me", updateCustomer);
 router.delete("/me", deleteCustomer);
 router.put("/me/profile-pic", updateProfilePicture);
 router.post("/reset-password", resetPassword); 
+
 
 export default router;

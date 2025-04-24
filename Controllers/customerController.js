@@ -131,28 +131,38 @@ export const getLoggedInCustomer = async (req, res) => {
     }
 };
 
-// Update customer info
+//update customer details
+
 export const updateCustomer = async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const { f_name, l_name, contact_no, email } = req.body;
+    const { f_name, l_name, contact_no, email, username } = req.body;
 
     try {
+        const existingUser = await Customer.findOne({ username });
+        if (existingUser && existingUser.cus_id !== req.session.user.cus_id) {
+            return res.status(409).json({ error: "Username already taken" });
+        }
+
         const customer = await Customer.findOneAndUpdate(
             { cus_id: req.session.user.cus_id },
-            { f_name, l_name, contact_no, email },
+            { f_name, l_name, contact_no, email, username },
             { new: true }
         );
 
         if (!customer) return res.status(404).json({ error: "Customer not found" });
+
+        // Update session if username is changed
+        req.session.user.username = customer.username;
 
         res.status(200).json({ message: "Profile updated", customer });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 //  Update profile picture
 export const updateProfilePicture = async (req, res) => {
