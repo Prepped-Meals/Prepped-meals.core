@@ -12,6 +12,7 @@ import session from "express-session";
 import path from "path"; 
 import { fileURLToPath } from "url";
 import authRoutes from "./Routes/authRoutes.js";
+import feedbackRoutes from "./Routes/feedbackRoutes.js";
 
 
 
@@ -62,6 +63,8 @@ app.use('/uploads', express.static('uploads'));
 
 
 
+
+
 app.use("/api/customers", customerRoutes);
 app.use("/api/card-details", paymentcardRoutes);
 app.use("/api/cart", cartRoutes);
@@ -69,6 +72,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/create-meals",mealRoutes);
 app.use("/api/get-meals",mealRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 
 
