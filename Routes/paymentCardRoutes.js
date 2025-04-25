@@ -1,8 +1,24 @@
 import express from "express";
-import { createCardDetails } from "../Controllers/paymentCardController.js";
- 
+import {
+  createCardDetails,
+  updateCardDetails,
+  deleteCardDetails,
+  getCardDetailsById 
+} from "../Controllers/paymentCardController.js";
+
 const router = express.Router();
- 
-router.post("/add-payment-card", createCardDetails); // Store card details
- 
+
+// Create
+router.post("/add-payment-card", createCardDetails);
+
+// Update
+router.put("/update-payment-card/:id", updateCardDetails);
+
+// Delete
+router.delete("/delete-payment-card/:id", deleteCardDetails);
+
+//Get
+router.get("/get-payment-card/:cardId", getCardDetailsById);
+
 export default router;
+
