@@ -51,18 +51,7 @@ export const createCustomer = async (req, res) => {
             profile_pic: customer.profile_pic
         };
 
-        res.status(200).json({
-            message: "Login successful",
-            customer: {
-                _id: customer._id,
-                cus_id: customer.cus_id,
-                username: customer.username,
-                f_name: customer.f_name,
-                l_name: customer.l_name,
-                email: customer.email,
-            }
-        })
-                
+         
         res.status(201).json({ message: "Customer registered and logged in", customer: req.session.user });
     } catch (error) {
         if (error.code === 11000) {
