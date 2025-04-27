@@ -1,6 +1,7 @@
 import Feedback from '../Models/feedbackModel.js';
 import { v4 as uuidv4 } from 'uuid';
 
+//add feedback
 export const submitFeedback = async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: "Not authenticated" });
@@ -24,3 +25,20 @@ export const submitFeedback = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+//view all meals (for admin)
+
+export const getAllFeedbacks = async (req, res) => {
+    try {
+        
+        const feedbacks = await Feedback.find()
+            .populate('customer', 'name email') // Adjust fields as per your user model
+            .sort({ createdAt: -1 }); // Sort by latest first
+
+        res.status(200).json(feedbacks);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
