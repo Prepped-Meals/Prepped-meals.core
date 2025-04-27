@@ -57,6 +57,7 @@ const seedDatabase = async () => {
 if (!cart) {
     const customer = await Customer.findOne();
     const meal = await Meal.findOne();
+    const payment = await Payment.findOne();
 
     if (!customer || !meal) {
         console.error("Cannot create cart: Missing customer or meal");
@@ -83,13 +84,23 @@ if (!cart) {
     }
 
     // Seed Order
+    // Seed Order
     if (!(await Order.findOne())) {
       await Order.create({
         order_id: "O1",
         customer: customer._id,
-        order_address: "123 Street",
+        payment: payment._id,
+        cart_items: [
+          {
+            meal_id: meal._id,
+            meal_name: meal.name,
+            quantity: 2,
+            meal_price: meal.price,
+            total_price: meal.price * 2,
+          },
+        ],
+        order_received_date: new Date(),
         order_status: "Pending",
-        cart: cart._id,
       });
       console.log("Order Created");
     }

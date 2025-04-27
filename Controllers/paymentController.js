@@ -5,7 +5,6 @@ import { createPayment } from "../Services/paymentServices.js";
 // @route   POST /api/payments
 // @access  Public
 export const addPayment = async (req, res) => {
-  console.log("req.body", req.body);
   try {
     const { error } = validatePayment(req.body);
     if (error) {
