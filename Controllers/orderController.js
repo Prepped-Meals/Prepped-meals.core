@@ -4,6 +4,8 @@ import {
 } from "../Services/orderService.js";
 import { validateOrder } from "../Dto/orderDTOs/orderDTO.js";
 import Order from "../Models/orderModel.js";
+import Meal from "../Models/mealModel.js";
+import { updateMealStockAfterOrder } from "./mealController.js";
 
 export const addOrder = async (req, res) => {
   try {
@@ -16,6 +18,9 @@ export const addOrder = async (req, res) => {
     }
 
     const order = await createOrder(req.body);
+
+    await updateMealStockAfterOrder(order); // Call the Meal Controller's function to update stock
+
     return res.status(201).json({
       success: true,
       data: order,
@@ -60,3 +65,5 @@ export const getOrdersByCustomer = async (req, res) => {
     });
   }
 };
+
+
