@@ -33,7 +33,7 @@ const createMeal = async (req, res) => {
                 return res.status(400).json({ error: error.details[0] });
             }
 
-            const { meal_name, meal_description, meal_price, calorie_count, admin } = value;
+            const { meal_name, meal_description, meal_price, calorie_count, admin, meal_stock } = value;
 
             //auto generate meal id 
             const meal_id = 'MEAL-' + Date.now();
@@ -48,7 +48,9 @@ const createMeal = async (req, res) => {
                 meal_price,
                 calorie_count,
                 admin,
-                meal_image: imagePath
+                meal_image: imagePath,
+                meal_stock,
+                total_sold:0,
             });
 
             await newMeal.save();
@@ -89,24 +91,34 @@ const updateMeal = async (req, res) => {
             const { id } = req.params; // Extract meal_id from the request params
             const updates = { ...req.body }; // Get meal data from the request body
 
+            // Check if there's a new stock value
+            if (updates.meal_stock !== undefined && updates.meal_stock < 0) {
+                return res.status(400).json({ error: "Stock cannot be negative" });
+            }
+
             // If a new image is uploaded, update the image path in the meal data
             if (req.file) {
                 // Fetch the existing meal to get old image path
                 const existingMeal = await Meal.findOne({ meal_id: id });
-            
+
                 // Delete old image if it exists
                 if (existingMeal && existingMeal.meal_image) {
                     const oldImagePath = existingMeal.meal_image.startsWith('/')
                         ? existingMeal.meal_image.slice(1)
                         : existingMeal.meal_image;
-            
+
                     if (fs.existsSync(oldImagePath)) {
                         fs.unlinkSync(oldImagePath);
                     }
                 }
-            
+
                 // Set new image path
                 updates.meal_image = '/' + req.file.path.replace(/\\/g, '/');
+            }
+
+            // If `meal_stock` is provided, include it in the update, otherwise it remains the same
+            if (updates.meal_stock === undefined) {
+                delete updates.meal_stock; // Remove `meal_stock` from update object if not provided
             }
 
             // Find the meal by its custom meal_id and update it with the new data
@@ -131,7 +143,8 @@ const updateMeal = async (req, res) => {
 };
 
 
-// delete a meal
+
+
 
 // DELETE a meal
 const deleteMeal = async (req, res) => {
@@ -162,7 +175,37 @@ const deleteMeal = async (req, res) => {
         console.error("Error deleting meal:", error);
         res.status(500).json({ error: "Server error", message: error.message });
     }
+}
+
+
+export const updateMealStockAfterOrder = async (order) => {
+  try {
+    // Loop through the cart items of the order and update the meal stock
+    for (let item of order.cart_items) {
+      const meal = await Meal.findOne({ _id: item.meal_id });
+
+      if (meal) {
+        // Check if there is enough stock
+        if (meal.meal_stock >= item.quantity) {
+          // Update the stock and total sold
+          meal.total_sold += item.quantity;
+          meal.meal_stock -= item.quantity;
+
+          // Save the updated meal data
+          await meal.save();
+        } else {
+          throw new Error(`Not enough stock for meal: ${item.meal_name}`);
+        }
+      } else {
+        throw new Error(`Meal not found for ID: ${item.meal_id}`);
+      }
+    }
+  } catch (error) {
+    console.error("Error updating meal stock:", error.message);
+    throw new Error("Failed to update meal stock");
+  }
 };
+
 
 
 
