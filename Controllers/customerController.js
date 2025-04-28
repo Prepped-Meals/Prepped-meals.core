@@ -235,9 +235,10 @@ export const resetPassword = async (req, res) => {
 };
 
 // Get all customers (admin use)
+
 export const getCustomers = async (req, res) => {
     try {
-        const customers = await Customer.find();
+        const customers = await Customer.find({}, 'f_name l_name email username');
         res.status(200).json(customers);
     } catch (error) {
         res.status(500).json({ error: error.message });
