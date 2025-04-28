@@ -10,3 +10,9 @@ export const getOrdersByCustomerService = async (customerId) => {
     "customer payment cart_items.meal_id"
   );
 };
+
+export const getAllOrdersService = async () => {
+  return await Order.find()
+    .populate("customer payment cart_items.meal_id")
+    .sort({ order_received_date: -1 }); // newest first
+};
