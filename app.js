@@ -13,7 +13,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./Routes/authRoutes.js";
 import feedbackRoutes from "./Routes/feedbackRoutes.js";
-import orderRoutes from "./Routes/orderRoutes.js"
+import orderRoutes from "./Routes/orderRoutes.js";
+import mealReportRoutes from "./Routes/mealReportRoutes.js";
+
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,6 +68,7 @@ app.use("/api/get-meals",mealRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/mealReports", mealReportRoutes);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
