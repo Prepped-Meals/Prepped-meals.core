@@ -4,6 +4,7 @@ import {
 } from "../Services/orderService.js";
 import { validateOrder } from "../Dto/orderDTOs/orderDTO.js";
 import Order from "../Models/orderModel.js";
+import { getAllOrdersService } from "../Services/orderService.js";
 import Meal from "../Models/mealModel.js";
 import { updateMealStockAfterOrder } from "./mealController.js";
 
@@ -66,4 +67,19 @@ export const getOrdersByCustomer = async (req, res) => {
   }
 };
 
-
+export const getAllOrders = async (req, res) => {
+  try {
+    const orders = await getAllOrdersService();
+    return res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (error) {
+    console.error("Get All Orders Error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};

@@ -15,6 +15,7 @@ import authRoutes from "./Routes/authRoutes.js";
 import feedbackRoutes from "./Routes/feedbackRoutes.js";
 import orderRoutes from "./Routes/orderRoutes.js";
 import mealReportRoutes from "./Routes/mealReportRoutes.js";
+import customerReportRoutes from "./Routes/customerReportRoutes.js";
 
 
 
@@ -69,6 +70,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/mealReports", mealReportRoutes);
+app.use('/api', customerReportRoutes);
+
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
