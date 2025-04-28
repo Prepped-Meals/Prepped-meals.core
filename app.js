@@ -14,6 +14,7 @@ import { fileURLToPath } from "url";
 import authRoutes from "./Routes/authRoutes.js";
 import feedbackRoutes from "./Routes/feedbackRoutes.js";
 import orderRoutes from "./Routes/orderRoutes.js";
+import mealReportRoutes from "./Routes/mealReportRoutes.js";
 import customerReportRoutes from "./Routes/customerReportRoutes.js";
 
 
@@ -68,6 +69,7 @@ app.use("/api/get-meals",mealRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/mealReports", mealReportRoutes);
 app.use('/api', customerReportRoutes);
 
 
