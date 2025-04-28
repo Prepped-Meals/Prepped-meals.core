@@ -37,6 +37,10 @@ const customerSchema = new mongoose.Schema({
         default: "uploads/user.png", 
     },
     
+    createdAt: {
+        type: Date,
+        default: Date.now, // Automatically set created date to current date and time
+    }
 });
 
 customerSchema.pre('save', function (next) {

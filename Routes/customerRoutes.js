@@ -14,7 +14,7 @@ import {
 
 const router = Router();
 
-router.get("/", getCustomers);
+router.get('/', getCustomers);
 router.post("/register", createCustomer);
 router.post("/login", loginCustomer);
 router.post("/logout", logoutCustomer);
