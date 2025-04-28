@@ -1,5 +1,6 @@
 import { validatePayment } from "../Dto/paymentDTOs/payment.dto.js";
 import { createPayment } from "../Services/paymentServices.js";
+import { getWeeklyPaymentReport } from "../Services/paymentServices.js";
 
 // @desc    Create a new payment
 // @route   POST /api/payments
@@ -21,6 +22,23 @@ export const addPayment = async (req, res) => {
     });
   } catch (error) {
     console.error("Payment Error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+export const weeklyPaymentReport = async (req, res) => {
+  try {
+    const report = await getWeeklyPaymentReport();
+    return res.status(200).json({
+      success: true,
+      data: report,
+    });
+  } catch (error) {
+    console.error("Weekly Payment Report Error:", error.message);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
