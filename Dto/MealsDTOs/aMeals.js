@@ -6,7 +6,8 @@ const mealDTO = Joi.object({
     meal_description: Joi.string().max(500).required(),
     meal_price: Joi.number().min(0).required(),
     calorie_count: Joi.number().min(0).required(),
-    admin: Joi.string().hex().length(24).required()
+    admin: Joi.string().hex().length(24).required(),
+    meal_stock: Joi.number().required(),
 });
 
 export { mealDTO };
