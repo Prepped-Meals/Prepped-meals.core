@@ -8,7 +8,7 @@ export const loginCustomer = async (req, res) => {
 
     try {
         // Check if user is admin
-        if (username === "admin" && password === "admin123") {
+        if (username === "admin" && password === "admin@2002") {
             req.session.user = { role: "admin", username: "admin" };
             return res.status(200).json({ message: "Admin login successful", role: "admin" });
         }
