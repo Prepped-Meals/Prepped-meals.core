@@ -39,7 +39,7 @@ const customerSchema = new mongoose.Schema({
     
     createdAt: {
         type: Date,
-        default: Date.now, // Automatically set created date to current date and time
+        default: Date.now, 
     }
 });
 
