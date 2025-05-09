@@ -1,5 +1,5 @@
 import express from "express";
-import { addOrder, getOrdersByCustomer, getAllOrders  } from "../Controllers/orderController.js";
+import { addOrder, getOrdersByCustomer, getAllOrders ,updateOrderStatus } from "../Controllers/orderController.js";
 import { generateCalorieReport, downloadCalorieReportPDF } from "../Controllers/generateCalorieReport.js";
 
 
@@ -20,6 +20,8 @@ router.get("/get-all-orders", getAllOrders);
 
 router.get("/top-customers-report", generateTopCustomersReport);
 router.get("/generate-order-status-report", generateOrderStatusReport);
+
+router.put ("/update-status/:orderId", updateOrderStatus);
 
 export default router;
 

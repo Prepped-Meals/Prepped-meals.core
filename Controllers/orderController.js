@@ -83,3 +83,44 @@ export const getAllOrders = async (req, res) => {
     });
   }
 };
+
+
+//controller for updating order status
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    if (!["Pending", "Completed", "Cancelled"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value",
+      });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    order.order_status = status;
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Order status updated successfully",
+      data: order,
+    });
+  } catch (error) {
+    console.error("Update Order Status Error:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
