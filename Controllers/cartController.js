@@ -2,7 +2,9 @@ import { cartDTO } from "../Dto/CartDTOs/cart.dto.js";
 import {
   addMealToCartService,
   updateCartService,
-  deleteCartService
+  deleteCartService,
+  deleteMealFromCartService,
+  getCartByCustomerService,
 } from "../Services/cartService.js";
 import Cart from "../Models/cartModel.js";
 
@@ -60,8 +62,7 @@ export const addMealToCart = async (req, res) => {
     }
 
     await cart.save();
-    return res.status(200).json({ success: true, cart });
-
+    return res.status(200).json({ success: true, cart, cart_id: cart.cart_id });
   } catch (error) {
     console.error("Cart Update Error:", error);
     return res.status(500).json({ success: false, error: "Internal Server Error" });
@@ -104,6 +105,45 @@ export const deleteCart = async (req, res) => {
 
     res.status(200).json({ message: "Cart deleted successfully" });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Controller to delete a specific meal from a cart.
+ */
+export const deleteMealFromCart = async (req, res) => {
+  try {
+    const { cart_id, meal_id } = req.params;
+    console.log(`Received DELETE request for cart_id: ${cart_id}, meal_id: ${meal_id}`);
+    const updatedCart = await deleteMealFromCartService(cart_id, meal_id);
+
+    if (!updatedCart) {
+      return res.status(404).json({ message: "Cart or meal not found" });
+    }
+
+    res.status(200).json({ message: "Meal removed from cart successfully", cart: updatedCart });
+  } catch (err) {
+    console.error("Delete Meal Error:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Controller to get a cart by customer ID.
+ */
+export const getCartByCustomer = async (req, res) => {
+  try {
+    const { customer_id } = req.params;
+    const cart = await getCartByCustomerService(customer_id);
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    res.status(200).json({ success: true, cart });
+  } catch (err) {
+    console.error("Get Cart Error:", err);
     res.status(500).json({ error: err.message });
   }
 };
