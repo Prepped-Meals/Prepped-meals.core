@@ -7,7 +7,7 @@ export const submitFeedback = async (req, res) => {
         return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const { feedback_description } = req.body;
+    const { feedback_description, rating } = req.body; // Added rating
     if (!feedback_description || feedback_description.trim() === "") {
         return res.status(400).json({ error: "Feedback cannot be empty" });
     }
@@ -17,6 +17,7 @@ export const submitFeedback = async (req, res) => {
             feedback_id: uuidv4(),
             customer: req.session.user._id,
             feedback_description,
+            rating: rating || null, 
         });
 
         await newFeedback.save();
@@ -30,7 +31,7 @@ export const submitFeedback = async (req, res) => {
 export const getAllFeedbacks = async (req, res) => {
     try {
         const feedbacks = await Feedback.find()
-            .populate('customer', 'f_name l_name email profile_pic') // ✅ updated
+            .populate('customer', 'f_name l_name email profile_pic')
             .sort({ createdAt: -1 });
 
         res.status(200).json(feedbacks);
@@ -42,7 +43,7 @@ export const getAllFeedbacks = async (req, res) => {
 // Edit feedback
 export const updateFeedback = async (req, res) => {
     const { id } = req.params;
-    const { feedback_description } = req.body;
+    const { feedback_description, rating } = req.body; 
 
     if (!feedback_description || feedback_description.trim() === "") {
         return res.status(400).json({ error: "Feedback cannot be empty" });
@@ -55,12 +56,12 @@ export const updateFeedback = async (req, res) => {
             return res.status(404).json({ error: "Feedback not found" });
         }
 
-        // Check if the logged-in user is the one who created the feedback
         if (feedback.customer.toString() !== req.session.user._id) {
             return res.status(403).json({ error: "Unauthorized to update this feedback" });
         }
 
         feedback.feedback_description = feedback_description;
+        feedback.rating = rating || null; 
         await feedback.save();
 
         res.status(200).json({ message: "Feedback updated successfully" });
@@ -69,7 +70,7 @@ export const updateFeedback = async (req, res) => {
     }
 };
 
-// Delete feedback
+// Delete feedback (no changes needed)
 export const deleteFeedback = async (req, res) => {
     const { id } = req.params;
 
@@ -80,7 +81,6 @@ export const deleteFeedback = async (req, res) => {
             return res.status(404).json({ error: "Feedback not found" });
         }
 
-        // Check if the logged-in user is the one who created the feedback
         if (feedback.customer.toString() !== req.session.user._id) {
             return res.status(403).json({ error: "Unauthorized to delete this feedback" });
         }
@@ -93,7 +93,7 @@ export const deleteFeedback = async (req, res) => {
     }
 };
 
-// Mark feedback as helpful
+// Mark feedback as helpful (no changes needed)
 export const markHelpful = async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ error: "Not authenticated" });
