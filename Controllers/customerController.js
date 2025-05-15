@@ -4,6 +4,13 @@ import bcrypt from "bcrypt";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import Order from "../Models/orderModel.js";
+import Payment from "../Models/paymentModel.js";
+import CardDetails from "../Models/paymentcardModel.js";
+import Cart from "../Models/cartModel.js";
+import Feedback from "../Models/feedbackModel.js"; 
+
+
 
 // Password hashing
 const hashPassword = async (password) => {
@@ -62,35 +69,7 @@ export const createCustomer = async (req, res) => {
     }
 };
 
-// Login
-// export const loginCustomer = async (req, res) => {
-//     const { username, password } = req.body;
 
-//     try {
-//         const customer = await Customer.findOne({ username });
-//         if (!customer) return res.status(401).json({ error: "Invalid username or password" });
-
-//         const isMatch = await bcrypt.compare(password, customer.password);
-//         if (!isMatch) return res.status(401).json({ error: "Invalid username or password" });
-
-//         const profilePic = customer.profile_pic && customer.profile_pic.trim() !== ""
-//             ? customer.profile_pic
-//             : "uploads/user.png";
-
-//         req.session.user = {
-//             cus_id: customer.cus_id,
-//             username: customer.username,
-//             f_name: customer.f_name,
-//             l_name: customer.l_name,
-//             email: customer.email,
-//             profile_pic: profilePic
-//         };
-
-//         res.status(200).json({ message: "Login successful", customer: req.session.user });
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// };
 
 // Logout
 export const logoutCustomer = (req, res) => {
@@ -192,13 +171,32 @@ export const deleteCustomer = async (req, res) => {
     if (!req.session.user) return res.status(401).json({ error: "Not authenticated" });
 
     try {
-        const result = await Customer.findOneAndDelete({ cus_id: req.session.user.cus_id });
+        const customerId = req.session.user._id;
 
+        // Find orders and extract payment IDs
+        const orders = await Order.find({ customer: customerId });
+        const paymentIds = orders.map(order => order.payment);
+
+        // Delete all related documents
+        await Order.deleteMany({ customer: customerId });
+        await Payment.deleteMany({
+            $or: [
+                { _id: { $in: paymentIds } },
+                { customer: customerId }
+            ]
+        });
+        await CardDetails.deleteMany({ customer: customerId });
+        await Cart.deleteMany({ customer: customerId });
+        await Feedback.deleteMany({ customer: customerId }); 
+
+        // Delete the customer
+        const result = await Customer.findOneAndDelete({ _id: customerId });
         if (!result) return res.status(404).json({ error: "Customer not found" });
 
         req.session.destroy(() => {
-            res.status(200).json({ message: "Account deleted" });
+            res.status(200).json({ message: "Customer account and all related data deleted successfully." });
         });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
