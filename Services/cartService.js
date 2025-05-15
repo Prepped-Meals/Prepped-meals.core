@@ -59,6 +59,38 @@ export const deleteCartService = async (cart_id) => {
 };
 
 /**
+ * Delete a specific meal from a cart by cart_id and meal_id.
+ */
+export const deleteMealFromCartService = async (cart_id, meal_id) => {
+  const cart = await Cart.findOne({ cart_id });
+  if (!cart) return null;
+
+  const initialLength = cart.meals.length;
+  cart.meals = cart.meals.filter((m) => m.meal.toString() !== meal_id);
+
+  if (cart.meals.length === initialLength) {
+    return null; // Meal not found in cart
+  }
+
+  if (cart.meals.length === 0) {
+    // Delete cart if no meals remain
+    await Cart.findOneAndDelete({ cart_id });
+    return null;
+  }
+
+  await cart.save();
+  return cart;
+};
+
+/**
+ * Get a cart by customer_id.
+ */
+export const getCartByCustomerService = async (customer_id) => {
+  const cart = await Cart.findOne({ customer: customer_id });
+  return cart;
+};
+
+/**
  * Helper to format meals with total_price calculation.
  */
 const formatMeals = async (meals) => {
