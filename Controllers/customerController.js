@@ -45,9 +45,11 @@ export const createCustomer = async (req, res) => {
             customerData.profile_pic = "uploads/user.png";
         }
 
+        //save new customer to database
         const customer = new Customer(customerData);
         await customer.save();
 
+        // Set session data
         req.session.user = {
             _id: customer._id,
             cus_id: customer.cus_id,
@@ -61,6 +63,7 @@ export const createCustomer = async (req, res) => {
          
         res.status(201).json({ message: "Customer registered and logged in", customer: req.session.user });
     } catch (error) {
+        // Handle duplicate key error (username or email)
         if (error.code === 11000) {
             res.status(409).json({ error: "Username or email already exists" });
         } else {
@@ -71,7 +74,7 @@ export const createCustomer = async (req, res) => {
 
 
 
-// Logout
+// Logout customer
 export const logoutCustomer = (req, res) => {
     req.session.destroy((err) => {
         if (err) return res.status(500).json({ error: "Logout failed" });
@@ -109,6 +112,7 @@ export const updateCustomer = async (req, res) => {
     const { f_name, l_name, contact_no, email, username } = req.body;
 
     try {
+        // Validate input
         const existingUser = await Customer.findOne({ username });
         if (existingUser && existingUser.cus_id !== req.session.user.cus_id) {
             return res.status(409).json({ error: "Username already taken" });
@@ -166,7 +170,7 @@ export const updateProfilePicture = async (req, res) => {
     });
 };
 
-// Delete customer
+// Delete customer's acccount and all related data
 export const deleteCustomer = async (req, res) => {
     if (!req.session.user) return res.status(401).json({ error: "Not authenticated" });
 
@@ -217,6 +221,7 @@ export const resetPassword = async (req, res) => {
             return res.status(404).json({ error: "Customer not found" });
         }
 
+        //Update with new hashed password
         const isMatch = await bcrypt.compare(currentPassword, customer.password);
         if (!isMatch) {
             return res.status(400).json({ error: "Current password is incorrect" });
