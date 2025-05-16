@@ -5,7 +5,7 @@ const FeedbackSchema = new mongoose.Schema({
   customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer", required: true },
   feedback_description: { type: String, required: true },
   helpful: [{ type: mongoose.Schema.Types.ObjectId, ref: "Customer" }],
-  rating: { type: Number, min: 1, max: 5 }, // NEW: Added rating field
+  rating: { type: Number, min: 1, max: 5 }, 
 }, { timestamps: true });
 
 const Feedback = mongoose.model("Feedback", FeedbackSchema);

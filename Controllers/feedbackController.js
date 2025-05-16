@@ -70,7 +70,7 @@ export const updateFeedback = async (req, res) => {
     }
 };
 
-// Delete feedback (no changes needed)
+// Delete feedback (admin or owner can delete)
 export const deleteFeedback = async (req, res) => {
     const { id } = req.params;
 
@@ -81,7 +81,11 @@ export const deleteFeedback = async (req, res) => {
             return res.status(404).json({ error: "Feedback not found" });
         }
 
-        if (feedback.customer.toString() !== req.session.user._id) {
+        const userId = req.session.user._id;
+        const userRole = req.session.user.role; // 'admin' or 'customer'
+
+        // Allow delete if admin or the original customer
+        if (feedback.customer.toString() !== userId && userRole !== 'admin') {
             return res.status(403).json({ error: "Unauthorized to delete this feedback" });
         }
 
@@ -92,6 +96,7 @@ export const deleteFeedback = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 // Mark feedback as helpful (no changes needed)
 export const markHelpful = async (req, res) => {
