@@ -11,8 +11,8 @@ const router = Router();
 
 router.post("/", submitFeedback);
 router.get("/", getAllFeedbacks);
-router.put("/:id", updateFeedback);  // Updated route for feedback update
-router.delete("/:id", deleteFeedback);  // Updated route for feedback delete
-router.post("/:id/helpful", markHelpful); // NEW
+router.put("/:id", updateFeedback);  
+router.delete("/:id", deleteFeedback);  
+router.post("/:id/helpful", markHelpful); 
 
 export default router;
