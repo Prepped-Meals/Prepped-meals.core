@@ -13,9 +13,9 @@
   "type": "module",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "chartjs-node-canvas": "^5.0.0",
     "canvas": "^3.1.0",
     "chart.js": "^4.4.9",
+    "chartjs-node-canvas": "^5.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -27,8 +27,9 @@
     "mongoose": "^8.13.2",
     "multer": "^1.4.5-lts.2",
     "nodemon": "^3.1.9",
-    "pdfkit": "^0.17.0",
+    "pdfkit": "^0.17.1",
     "pdfkit-table": "^0.1.99",
+    "puppeteer": "^24.8.2",
     "uuid": "^11.1.0"
   }
 }
