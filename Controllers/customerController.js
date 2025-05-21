@@ -170,12 +170,24 @@ export const updateProfilePicture = async (req, res) => {
     });
 };
 
-// Delete customer's acccount and all related data
+// Delete customer's account and all related data
 export const deleteCustomer = async (req, res) => {
     if (!req.session.user) return res.status(401).json({ error: "Not authenticated" });
 
     try {
         const customerId = req.session.user._id;
+
+        // Check for pending orders
+        const pendingOrders = await Order.find({ 
+            customer: customerId, 
+            order_status: { $in: ['Pending'] } 
+        });
+        
+        if (pendingOrders.length > 0) {
+            return res.status(400).json({ 
+                error: "Cannot delete account with pending orders. Please complete your orders first." 
+            });
+        }
 
         // Find orders and extract payment IDs
         const orders = await Order.find({ customer: customerId });
@@ -191,7 +203,7 @@ export const deleteCustomer = async (req, res) => {
         });
         await CardDetails.deleteMany({ customer: customerId });
         await Cart.deleteMany({ customer: customerId });
-        await Feedback.deleteMany({ customer: customerId }); 
+        await Feedback.deleteMany({ customer: customerId });
 
         // Delete the customer
         const result = await Customer.findOneAndDelete({ _id: customerId });
